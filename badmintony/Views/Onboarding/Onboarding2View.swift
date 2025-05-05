@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct Onboarding2View: View {
+    @State private var showOnboarding3 = false
+    
     var body: some View {
         VStack {
             VStack(spacing: 8) {
@@ -19,14 +21,12 @@ struct Onboarding2View: View {
             Rectangle()
                 .fill(Color(white: 0.98))
                 .frame(maxWidth: .infinity, maxHeight: 300)
-                .overlay(Text("插图区域").foregroundColor(.gray))
+                .overlay(Text("插圖區域").foregroundColor(.gray))
                 .padding(.horizontal, 24)
 
             Spacer()
 
-            Button(action: {
-                // 跳转逻辑
-            }) {
+            NavigationLink(destination: Onboarding3View()) {
                 Text("下一步")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)

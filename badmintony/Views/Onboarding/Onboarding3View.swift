@@ -1,13 +1,15 @@
 import SwiftUI
 
 struct Onboarding3View: View {
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
         VStack {
             VStack(spacing: 8) {
-                Text("全方位训练分析")
+                Text("全方位訓練分析")
                     .font(.system(size: 32, weight: .bold))
                     .foregroundColor(.black)
-                Text("多维度数据分析，配合时间与球种筛选，\n帮助您清晰掌握每次训练的进步")
+                Text("多维度數據分析，配合時間羽球種篩選，\n幫助您清晰掌握每次訓練的進步")
                     .font(.system(size: 17))
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
@@ -20,13 +22,14 @@ struct Onboarding3View: View {
             Rectangle()
                 .fill(Color(white: 0.98))
                 .frame(maxWidth: .infinity, maxHeight: 300)
-                .overlay(Text("插图区域").foregroundColor(.gray))
+                .overlay(Text("插圖區域").foregroundColor(.gray))
                 .padding(.horizontal, 24)
 
             Spacer()
 
             Button(action: {
-                // 跳转逻辑
+                // TODO: 这里可以添加进入主界面的逻辑
+                dismiss()
             }) {
                 Text("開始分析")
                     .font(.system(size: 17, weight: .semibold))
