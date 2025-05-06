@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeScreenView: View {
     @State private var showAnalysisDashboard = false
+    @State private var navigateToSelectShotType = false
     
     var body: some View {
         NavigationStack {
@@ -20,7 +21,7 @@ struct HomeScreenView: View {
 
                 VStack(spacing: 16) {
                     Button(action: {
-                        // TODO: 跳轉到上傳/錄影畫面
+                        navigateToSelectShotType = true
                     }) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("開始分析")
@@ -52,9 +53,6 @@ struct HomeScreenView: View {
                         .background(Color(white: 0.95))
                         .cornerRadius(12)
                     }
-                    .navigationDestination(isPresented: $showAnalysisDashboard) {
-                        AnalysisDashboardView()
-                    }
                 }
                 .padding(.horizontal, 24)
 
@@ -62,6 +60,12 @@ struct HomeScreenView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.white)
+            .navigationDestination(isPresented: $navigateToSelectShotType) {
+                SelectShotTypeView()
+            }
+            .navigationDestination(isPresented: $showAnalysisDashboard) {
+                AnalysisDashboardView()
+            }
         }
     }
 }

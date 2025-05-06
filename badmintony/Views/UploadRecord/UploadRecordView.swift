@@ -24,15 +24,10 @@ struct UploadRecordView: View {
             VStack(alignment: .leading, spacing: 16) {
                 // 導覽列
                 HStack {
-                    Button(action: { dismiss() }) {
-                        Text("< 返回")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 17))
-                    }
                     Spacer()
                     Text("上傳/錄製")
                         .font(.system(size: 17, weight: .semibold))
-                    Spacer().frame(width: 60)
+                    Spacer()
                 }
                 .padding(.top, 8)
                 .padding(.horizontal)
@@ -100,6 +95,7 @@ struct UploadRecordView: View {
                 Spacer()
             }
             .background(Color.white)
+            .navigationBarBackButtonHidden(false)
         }
     }
 }

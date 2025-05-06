@@ -79,7 +79,9 @@ struct SelectShotTypeView: View {
                 .padding(.bottom, 32)
                 .disabled(selectedShotType == nil)
                 .navigationDestination(isPresented: $navigateToUploadRecord) {
-                    UploadRecordView()
+                    if let shotType = selectedShotType {
+                        UploadRecordView(shotType: shotType)
+                    }
                 }
             }
             .background(Color.white)
