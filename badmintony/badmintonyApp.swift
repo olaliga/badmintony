@@ -23,9 +23,15 @@ struct badmintonyApp: App {
         }
     }()
 
+    @AppStorage("hasOnboarded") var hasOnboarded: Bool = false
+
     var body: some Scene {
         WindowGroup {
-            Onboarding1View()
+            if hasOnboarded {
+                HomeScreenView()
+            } else {
+                Onboarding1View()
+            }
         }
         .modelContainer(sharedModelContainer)
     }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AnalysisDashboardView: View {
-    @Environment(\.dismiss) private var dismiss
+    // @Environment(\.dismiss) private var dismiss // 不再需要
     // 篩選條件
     @State private var selectedTime: String = "本周"
     @State private var selectedShotType: String = "全部"
@@ -34,17 +34,10 @@ struct AnalysisDashboardView: View {
             VStack(spacing: 0) {
                 // 導覽列
                 HStack {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Text("< 返回")
-                            .foregroundColor(Color.blue)
-                            .font(.system(size: 17))
-                    }
                     Spacer()
                     Text("訓練分析")
                         .font(.system(size: 17, weight: .semibold))
-                    Spacer().frame(width: 60)
+                    Spacer()
                 }
                 .padding()
                 .background(Color.white)

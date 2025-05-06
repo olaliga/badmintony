@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct Onboarding3View: View {
-    @Environment(\.dismiss) private var dismiss
     @State private var navigateToHome = false
+    @AppStorage("hasOnboarded") var hasOnboarded: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -30,6 +30,7 @@ struct Onboarding3View: View {
                 Spacer()
 
                 Button(action: {
+                    hasOnboarded = true
                     navigateToHome = true
                 }) {
                     Text("開始分析")
