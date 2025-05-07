@@ -147,3 +147,34 @@ struct AnalysisDashboardView: View {
         }
     }
 }
+
+func getAnalysisScore(videoPath: String, shotType: String, completion: @escaping (Int?) -> Void) {
+    DispatchQueue.global().async {
+        let process = Process()
+        let pipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
+        process.arguments = ["badmintony/python_utils/analysis_score.py", videoPath, shotType]
+        process.standardOutput = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let output = String(data: data, encoding: .utf8) {
+                // 解析分數
+                if let scoreLine = output.split(separator: "\n").last,
+                   let score = Int(scoreLine.replacingOccurrences(of: "分析分數: ", with: "")) {
+                    DispatchQueue.main.async {
+                        completion(score)
+                    }
+                    return
+                }
+            }
+        } catch {
+            print("執行 python 失敗: \(error)")
+        }
+        DispatchQueue.main.async {
+            completion(nil)
+        }
+    }
+}

@@ -6,5 +6,7 @@
 	<array>
 		<string>remote-notification</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>我們需要使用您的相機來錄製羽球動作影片</string>
 </dict>
 </plist>
