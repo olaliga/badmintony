@@ -42,8 +42,8 @@ struct Onboarding2View: View {
     }
 }
 
-struct Onboarding2View_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview {
+    NavigationStack {
         Onboarding2View()
     }
 }

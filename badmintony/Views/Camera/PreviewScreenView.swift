@@ -1,12 +1,38 @@
 import SwiftUI
 import AVKit
 
+// 模擬分析函數
+func mockUploadVideoForAnalysis(videoURL: URL, shotType: String, completion: @escaping (Int, String) -> Void) {
+    // 模擬網絡延遲
+    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+        // 返回一個隨機分數和對應的分析文字
+        let randomScore = Int.random(in: 60...95)
+        let analysisText: String
+        
+        switch randomScore {
+        case 90...100:
+            analysisText = "您的動作表現非常出色！揮拍動作標準，擊球時機準確，重心穩定。建議可以嘗試更進階的技術動作。"
+        case 80...89:
+            analysisText = "您的動作整體表現良好。揮拍動作標準，擊球時機準確，但建議加強手腕收尾動作的穩定性。"
+        case 70...79:
+            analysisText = "您的動作基本正確，但還有改進空間。建議注意保持重心穩定，並加強手腕力量的運用。"
+        default:
+            analysisText = "您的動作需要改進。建議從基本動作開始練習，特別注意揮拍姿勢和擊球時機。"
+        }
+        
+        completion(randomScore, analysisText)
+    }
+}
+
 struct PreviewScreenView: View {
     @Environment(\.dismiss) private var dismiss
     let videoURL: URL
+    let selectedShotType: String
     @State private var isLoading = false
-    @State private var analysisScore: Int? = nil
-    @State private var showResult = false
+    @State private var showAnalysisResult = false
+    @State private var analysisScore: Int = 0
+    @State private var analysisText: String = ""
+    @Binding var navigationPath: NavigationPath
 
     var body: some View {
         VStack {
@@ -19,11 +45,12 @@ struct PreviewScreenView: View {
                 Spacer()
                 Button("使用") {
                     isLoading = true
-                    uploadVideoForAnalysis(videoURL: videoURL, shotType: "發球") { score in
+                    mockUploadVideoForAnalysis(videoURL: videoURL, shotType: selectedShotType) { score, text in
                         DispatchQueue.main.async {
                             self.analysisScore = score
+                            self.analysisText = text
                             self.isLoading = false
-                            self.showResult = true
+                            self.showAnalysisResult = true
                         }
                     }
                 }
@@ -44,12 +71,25 @@ struct PreviewScreenView: View {
             Spacer()
         }
         .background(Color.black.ignoresSafeArea())
-        .fullScreenCover(isPresented: $showResult) {
-            if let score = analysisScore {
-                AnalysisResultView(overallScore: score)
-            }
+        .navigationDestination(isPresented: $showAnalysisResult) {
+            AnalysisResultView(
+                overallScore: analysisScore,
+                analysisText: analysisText,
+                navigationPath: $navigationPath,
+                onDismiss: {
+                    dismiss()
+                }
+            )
         }
     }
+}
+
+#Preview {
+    PreviewScreenView(
+        videoURL: URL(string: "https://example.com/video.mp4")!,
+        selectedShotType: "發球",
+        navigationPath: .constant(NavigationPath())
+    )
 }
 
 

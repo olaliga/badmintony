@@ -1,78 +1,108 @@
 import SwiftUI
 
 struct AnalysisResultView: View {
-    @Environment(\.dismiss) private var dismiss
     let overallScore: Int
-    // 假資料
-    let analysisItems: [String] = [
-        "揮拍動作標準，擊球時機良好。",
-        "步伐靈活，但重心略高，建議加強下肢穩定。",
-        "肩膀發力自然，建議手腕收尾再明確一點。"
-    ]
-
+    let analysisText: String
+    @Binding var navigationPath: NavigationPath
+    @Environment(\.dismiss) private var dismiss
+    let onDismiss: () -> Void
+    
     var body: some View {
-        VStack(spacing: 0) {
-            // 導覽列
+        VStack(spacing: 24) {
+            // 顶部导航栏
             HStack {
-                Button("返回") { dismiss() }
-                    .foregroundColor(.blue)
-                    .font(.system(size: 17))
                 Spacer()
                 Text("分析結果")
-                    .font(.system(size: 17))
-                    .foregroundColor(.black)
+                    .font(.system(size: 17, weight: .semibold))
                 Spacer()
-                Button("分享") {
-                    // TODO: 分享功能
-                }
-                .foregroundColor(.blue)
-                .font(.system(size: 17))
+            }
+            .padding(.top, 8)
+            .padding(.horizontal)
+            
+            // 总体评分
+            VStack(spacing: 8) {
+                Text("總體評分")
+                    .font(.system(size: 17))
+                    .foregroundColor(.gray)
+                Text("\(overallScore)")
+                    .font(.system(size: 48, weight: .bold))
+                    .foregroundColor(.blue)
+            }
+            .padding(.top, 24)
+            
+            // 分析内容
+            VStack(alignment: .leading, spacing: 16) {
+                Text("分析內容")
+                    .font(.system(size: 17, weight: .semibold))
+                Text(analysisText)
+                    .font(.system(size: 15))
+                    .foregroundColor(.black.opacity(0.8))
             }
             .padding()
-            .background(Color.white)
-
-            ScrollView {
-                VStack(spacing: 24) {
-                    // 整體分數區
-                    VStack(spacing: 8) {
-                        Text("\(overallScore)")
-                            .font(.system(size: 48, weight: .regular))
-                            .foregroundColor(Color(red: 0.2, green: 0.6, blue: 1.0))
-                        Text("整體動作評分")
-                            .font(.system(size: 15))
-                            .foregroundColor(.gray)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 32)
-                    .background(Color(red: 0.95, green: 0.97, blue: 1.0))
-                    .cornerRadius(20)
-                    .padding(.horizontal, 24)
-
-                    // 詳細分析區
-                    VStack(alignment: .leading, spacing: 16) {
-                        ForEach(analysisItems, id: \.self) { item in
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(item)
-                                    .font(.system(size: 17))
-                                    .foregroundColor(.black)
-                            }
-                            .padding()
-                            .background(Color(white: 0.98))
-                            .cornerRadius(12)
-                        }
-                    }
-                    .padding(.horizontal, 24)
-                }
-                .padding(.top, 16)
+            .background(Color(white: 0.98))
+            .cornerRadius(12)
+            .padding(.horizontal)
+            
+            Spacer()
+            
+            // 返回主页按钮
+            Button(action: {
+                onDismiss()
+            }) {
+                Text("返回主頁")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, minHeight: 60)
+                    .background(Color.blue)
+                    .cornerRadius(12)
             }
-            .background(Color.white)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 32)
         }
-        .background(Color.white.ignoresSafeArea())
+        .background(Color.white)
     }
 }
 
-func uploadVideoForAnalysis(videoURL: URL, shotType: String, completion: @escaping (Int?) -> Void) {
-    let url = URL(string: "http://你的伺服器IP:8000/analyze/")!
+struct AnalysisItemView: View {
+    let title: String
+    let score: Int
+    let details: String
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(title)
+                    .font(.headline)
+                Spacer()
+                Text("\(score)")
+                    .font(.title2)
+                    .foregroundColor(.blue)
+            }
+            
+            Text(details)
+                .font(.subheadline)
+                .foregroundColor(.gray)
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(10)
+        .shadow(radius: 2)
+    }
+}
+
+#Preview {
+    NavigationStack {
+        AnalysisResultView(
+            overallScore: 85,
+            analysisText: "根據影片分析，您的動作整體表現良好。揮拍動作標準，擊球時機準確，但建議加強手腕收尾動作的穩定性，並注意保持重心穩定。",
+            navigationPath: .constant(NavigationPath()),
+            onDismiss: {}
+        )
+    }
+}
+
+func uploadVideoForAnalysis(videoURL: URL, shotType: String, completion: @escaping (Int?, String?) -> Void) {
+    let url = URL(string: "http://192.168.1.100:8000/analyze/")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
 
@@ -95,11 +125,12 @@ func uploadVideoForAnalysis(videoURL: URL, shotType: String, completion: @escapi
     URLSession.shared.uploadTask(with: request, from: data) { responseData, response, error in
         guard let responseData = responseData,
               let json = try? JSONSerialization.jsonObject(with: responseData) as? [String: Any],
-              let score = json["score"] as? Int else {
-            completion(nil)
+              let score = json["score"] as? Int,
+              let analysisText = json["analysis_text"] as? String else {
+            completion(nil, nil)
             return
         }
-        completion(score)
+        completion(score, analysisText)
     }.resume()
 }
 

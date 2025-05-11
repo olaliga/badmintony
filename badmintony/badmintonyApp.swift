@@ -27,10 +27,12 @@ struct badmintonyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if hasOnboarded {
-                HomeScreenView()
-            } else {
-                Onboarding1View()
+            NavigationStack {
+                if hasOnboarded {
+                    HomeScreenView()
+                } else {
+                    Onboarding1View()
+                }
             }
         }
         .modelContainer(sharedModelContainer)
