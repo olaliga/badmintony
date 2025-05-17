@@ -32,6 +32,7 @@ struct badmintonyApp: App {
                 if hasOnboarded {
                     HomeScreenView(navigationPath: $navigationPath)
                         .navigationBarBackButtonHidden(true)
+                        .navigationBarHidden(true)
                         .navigationDestination(for: NavigationDestination.self) { destination in
                             switch destination {
                             case .selectShotType:

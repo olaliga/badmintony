@@ -7,6 +7,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     @Published var showAlert = false
     @Published var alertMessage = ""
     @Published var isFlashOn = false
+    @Published var currentOrientation: UIDeviceOrientation = .portrait
 
     let session = AVCaptureSession()
     private let movieOutput = AVCaptureMovieFileOutput()
@@ -15,6 +16,20 @@ class CameraViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
     override init() {
         super.init()
         checkPermissions()
+        setupOrientationObserver()
+    }
+
+    private func setupOrientationObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(orientationChanged),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+    }
+
+    @objc private func orientationChanged() {
+        currentOrientation = UIDevice.current.orientation
     }
 
     func checkPermissions() {
@@ -175,6 +190,42 @@ class CameraViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
             return
         }
         
+        // 設置錄影方向
+        if #available(iOS 17.0, *) {
+            let angle: Double
+            switch currentOrientation {
+            case .portrait:
+                angle = 0
+            case .portraitUpsideDown:
+                angle = 180
+            case .landscapeLeft:
+                angle = 90
+            case .landscapeRight:
+                angle = 270
+            default:
+                angle = 0
+            }
+            
+            if connection.isVideoRotationAngleSupported(angle) {
+                connection.videoRotationAngle = angle
+            }
+        } else {
+            if connection.isVideoOrientationSupported {
+                switch currentOrientation {
+                case .portrait:
+                    connection.videoOrientation = .portrait
+                case .portraitUpsideDown:
+                    connection.videoOrientation = .portraitUpsideDown
+                case .landscapeLeft:
+                    connection.videoOrientation = .landscapeRight
+                case .landscapeRight:
+                    connection.videoOrientation = .landscapeLeft
+                default:
+                    connection.videoOrientation = .portrait
+                }
+            }
+        }
+        
         let tempDir = FileManager.default.temporaryDirectory
         let fileURL = tempDir.appendingPathComponent(UUID().uuidString + ".mov")
         print("開始錄影到: \(fileURL)")
@@ -203,6 +254,7 @@ class CameraViewModel: NSObject, ObservableObject, AVCaptureFileOutputRecordingD
 struct CameraScreenView: View {
     @StateObject private var cameraVM = CameraViewModel()
     @State private var showPreview = false
+    @State private var orientation: UIDeviceOrientation = .portrait
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
     let selectedShotType: String
@@ -210,7 +262,7 @@ struct CameraScreenView: View {
     var body: some View {
         ZStack {
             // 相機預覽
-            CameraPreview(session: cameraVM.session)
+            CameraPreview(session: cameraVM.session, orientation: $orientation)
                 .ignoresSafeArea()
             
             // 返回按鈕
@@ -288,6 +340,20 @@ struct CameraScreenView: View {
         }
         .onAppear {
             cameraVM.checkPermissions()
+            // 开始监听设备方向
+            UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+            NotificationCenter.default.addObserver(
+                forName: UIDevice.orientationDidChangeNotification,
+                object: nil,
+                queue: .main
+            ) { _ in
+                orientation = UIDevice.current.orientation
+            }
+        }
+        .onDisappear {
+            // 停止监听设备方向
+            UIDevice.current.endGeneratingDeviceOrientationNotifications()
+            NotificationCenter.default.removeObserver(self)
         }
         .fullScreenCover(isPresented: $showPreview) {
             if let url = cameraVM.videoURL {
