@@ -294,6 +294,7 @@ struct CameraScreenView: View {
                 PreviewScreenView(
                     videoURL: url,
                     selectedShotType: selectedShotType,
+                    isFromCamera: true,
                     navigationPath: $navigationPath
                 )
             }

@@ -125,6 +125,7 @@ struct UploadRecordView: View {
                 PreviewScreenView(
                     videoURL: url,
                     selectedShotType: selectedShotType,
+                    isFromCamera: false,
                     navigationPath: $navigationPath
                 )
             }
@@ -138,10 +139,8 @@ struct UploadRecordView: View {
                     overallScore: result.score,
                     analysisText: result.analysisText,
                     navigationPath: $navigationPath,
-                    onDismiss: {
-                        showAnalysis = false
-                        navigationPath.removeLast(navigationPath.count)
-                    }
+                    isFromCamera: false,
+                    onDismiss: {}
                 )
             }
         }

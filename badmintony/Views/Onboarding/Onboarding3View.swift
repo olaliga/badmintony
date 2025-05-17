@@ -3,6 +3,7 @@ import SwiftUI
 struct Onboarding3View: View {
     @State private var navigateToHome = false
     @AppStorage("hasOnboarded") var hasOnboarded: Bool = false
+    @Binding var navigationPath: NavigationPath
     
     var body: some View {
         VStack {
@@ -45,13 +46,13 @@ struct Onboarding3View: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white)
         .navigationDestination(isPresented: $navigateToHome) {
-            HomeScreenView()
+            HomeScreenView(navigationPath: $navigationPath)
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        Onboarding3View()
+        Onboarding3View(navigationPath: .constant(NavigationPath()))
     }
 }

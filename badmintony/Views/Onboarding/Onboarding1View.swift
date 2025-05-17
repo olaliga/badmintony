@@ -2,6 +2,7 @@ import SwiftUI
 
 struct Onboarding1View: View {
     @State private var showOnboarding2 = false
+    @Binding var navigationPath: NavigationPath
     
     var body: some View {
         VStack {
@@ -29,7 +30,7 @@ struct Onboarding1View: View {
             Spacer()
 
             // 底部按钮
-            NavigationLink(destination: Onboarding2View()) {
+            NavigationLink(destination: Onboarding2View(navigationPath: $navigationPath)) {
                 Text("開始使用")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.white)
@@ -47,6 +48,6 @@ struct Onboarding1View: View {
 
 #Preview {
     NavigationStack {
-        Onboarding1View()
+        Onboarding1View(navigationPath: .constant(NavigationPath()))
     }
 }

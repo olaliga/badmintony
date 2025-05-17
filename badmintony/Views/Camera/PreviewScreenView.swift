@@ -28,6 +28,7 @@ struct PreviewScreenView: View {
     @Environment(\.dismiss) private var dismiss
     let videoURL: URL
     let selectedShotType: String
+    let isFromCamera: Bool
     @State private var isLoading = false
     @State private var showAnalysisResult = false
     @State private var analysisScore: Int = 0
@@ -71,13 +72,28 @@ struct PreviewScreenView: View {
             Spacer()
         }
         .background(Color.black.ignoresSafeArea())
-        .navigationDestination(isPresented: $showAnalysisResult) {
+        .fullScreenCover(isPresented: $showAnalysisResult) {
             AnalysisResultView(
                 overallScore: analysisScore,
                 analysisText: analysisText,
                 navigationPath: $navigationPath,
+                isFromCamera: isFromCamera,
                 onDismiss: {
-                    dismiss()
+                    if isFromCamera {
+                        // 从相机进入时，需要多次 dismiss
+                        dismiss() // 关闭 AnalysisResultView
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            dismiss() // 关闭 PreviewScreenView
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                dismiss() // 关闭 CameraScreenView
+                            }
+                        }
+                    } else {
+                        // 从相册进入时，重置导航栈并关闭当前视图
+                        showAnalysisResult = false
+                        navigationPath = NavigationPath()
+                        dismiss()
+                    }
                 }
             )
         }
@@ -88,6 +104,7 @@ struct PreviewScreenView: View {
     PreviewScreenView(
         videoURL: URL(string: "https://example.com/video.mp4")!,
         selectedShotType: "發球",
+        isFromCamera: false,  // 添加预览参数
         navigationPath: .constant(NavigationPath())
     )
 }

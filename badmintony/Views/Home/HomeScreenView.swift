@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct HomeScreenView: View {
+    @Binding var navigationPath: NavigationPath
+    
     var body: some View {
         VStack(spacing: 24) {
             VStack(alignment: .leading, spacing: 8) {
@@ -16,7 +18,7 @@ struct HomeScreenView: View {
             Spacer()
 
             VStack(spacing: 16) {
-                NavigationLink(destination: SelectShotTypeView(navigationPath: .constant(NavigationPath()))) {
+                NavigationLink(destination: SelectShotTypeView(navigationPath: $navigationPath)) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("開始分析")
                             .font(.system(size: 20, weight: .semibold))
@@ -57,6 +59,6 @@ struct HomeScreenView: View {
 
 #Preview {
     NavigationStack {
-        HomeScreenView()
+        HomeScreenView(navigationPath: .constant(NavigationPath()))
     }
 }

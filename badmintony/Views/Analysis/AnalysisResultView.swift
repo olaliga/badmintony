@@ -5,6 +5,7 @@ struct AnalysisResultView: View {
     let analysisText: String
     @Binding var navigationPath: NavigationPath
     @Environment(\.dismiss) private var dismiss
+    let isFromCamera: Bool
     let onDismiss: () -> Void
     
     var body: some View {
@@ -47,6 +48,7 @@ struct AnalysisResultView: View {
             
             // 返回主页按钮
             Button(action: {
+                navigationPath = NavigationPath()
                 onDismiss()
             }) {
                 Text("返回主頁")
@@ -96,6 +98,7 @@ struct AnalysisItemView: View {
             overallScore: 85,
             analysisText: "根據影片分析，您的動作整體表現良好。揮拍動作標準，擊球時機準確，但建議加強手腕收尾動作的穩定性，並注意保持重心穩定。",
             navigationPath: .constant(NavigationPath()),
+            isFromCamera: false,
             onDismiss: {}
         )
     }

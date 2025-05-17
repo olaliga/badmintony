@@ -24,14 +24,16 @@ struct badmintonyApp: App {
     }()
 
     @AppStorage("hasOnboarded") var hasOnboarded: Bool = false
+    @State private var navigationPath = NavigationPath()
 
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
+            NavigationStack(path: $navigationPath) {
                 if hasOnboarded {
-                    HomeScreenView()
+                    HomeScreenView(navigationPath: $navigationPath)
+                        .navigationBarBackButtonHidden(true)
                 } else {
-                    Onboarding1View()
+                    Onboarding1View(navigationPath: $navigationPath)
                 }
             }
         }
