@@ -1,6 +1,11 @@
 import SwiftUI
 import AVKit
 
+// 添加导航路径枚举并修改导航逻辑
+enum NavigationDestination: Hashable {
+    case selectShotType
+}
+
 // 模擬分析函數
 func mockUploadVideoForAnalysis(videoURL: URL, shotType: String, completion: @escaping (Int, String) -> Void) {
     // 模擬網絡延遲
@@ -80,12 +85,17 @@ struct PreviewScreenView: View {
                 isFromCamera: isFromCamera,
                 onDismiss: {
                     if isFromCamera {
-                        // 从相机进入时，需要多次 dismiss
+                        // 从相机进入时，重置导航栈并关闭所有模态视图
                         dismiss() // 关闭 AnalysisResultView
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             dismiss() // 关闭 PreviewScreenView
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                 dismiss() // 关闭 CameraScreenView
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    // 重置导航栈并导航到 SelectShotTypeView
+                                    navigationPath = NavigationPath()
+                                    navigationPath.append(NavigationDestination.selectShotType)
+                                }
                             }
                         }
                     } else {
